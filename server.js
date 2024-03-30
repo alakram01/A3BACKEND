@@ -19,7 +19,31 @@ const password_pattern = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[a-zA-Z0-9]{8,}$/;
     }
 });
 
+let quoteHistory = [
+    {
+        id: 3,
+        clientName: 'Jon Doe',
+        gallonsRequested: 799,
+        deliveryAddress: '789 St.',
+        deliveryDate: '01-10-9024',
+        pricePerGallon: 999,
+        amountDue: 147
 
+
+    },
+    {
+        id: 4,
+        clientName: 'Cena Doe',
+        gallonsRequested: 799,
+        deliveryAddress: '789 St.',
+        deliveryDate: '01-10-2024',
+        pricePerGallon: 999,
+        amountDue: 2902
+
+        
+    },
+    // Add more quote objects as needed
+];
 // db.select('*').from('users').then(data=>{
 //    // console.log(data);
 // });
