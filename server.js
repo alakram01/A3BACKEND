@@ -268,6 +268,49 @@ app.post('/clientprofile',(req,res)=>{
 // });
 
 
+app.post('/GetQuote', (req, res) => {
+    const { gallonsRequested, deliveryDate, deliveryAddress,id,clientName } = req.body;
+    console.log(deliveryDate);
+    // Validate required fields
+    if (!gallonsRequested || !deliveryDate) {
+        return res.status(400).json({ error: 'Gallons requested and delivery date are required fields' });
+    }
+
+    // Calculate suggested price and total amount due
+    const suggestedPrice = calculateSuggestedPrice(gallonsRequested, deliveryDate);
+    const totalAmountDue = calculateTotalAmountDue(gallonsRequested, suggestedPrice);
+
+    // Generate a unique id (replace this with your logic)
+
+
+    // Construct quote object
+    const newQuote = {
+        id,
+        clientName,
+        gallonsRequested,
+        deliveryAddress, // Placeholder for client address
+        deliveryDate,
+        pricePerGallon: suggestedPrice,
+        amountDue: totalAmountDue
+    };
+
+    // Update database (or array) with the new quote
+    quoteHistory.push(newQuote);
+
+    // Redirect to GetQuote history upon successful database update
+    res.json('ok');
+});
+function calculateSuggestedPrice(gallonsRequested, deliveryDate) {
+    // Your logic for calculating suggested price based on gallonsRequested and deliveryDate
+    return 2.5; // Placeholder value
+}
+
+function calculateTotalAmountDue(gallonsRequested, suggestedPrice) {
+    // Your logic for calculating total amount due based on gallonsRequested and suggestedPrice
+    return gallonsRequested * suggestedPrice; // Placeholder value
+}
+
+
 // const PORT = process.env.PORT || 3000;
 const PORT = 3000;
  app.listen(PORT, () => {
