@@ -310,6 +310,16 @@ function calculateTotalAmountDue(gallonsRequested, suggestedPrice) {
     return gallonsRequested * suggestedPrice; // Placeholder value
 }
 
+app.post('/qoutehistory',(req,res)=>{
+    const {id} = req.body;
+    //console.log(id, quoteHistory);
+    const robots = quoteHistory.filter(qoute => qoute.id === id);
+    console.log(robots);
+    res.json(robots);
+});
+
+
+
 
 // const PORT = process.env.PORT || 3000;
 const PORT = 3000;
