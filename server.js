@@ -1,8 +1,12 @@
 const express = require('express');
-const app =express();
+const app = express();
 const cors =require('cors');
 const knex = require('knex');
 const bcrypt = require ('bcrypt-nodejs');
+
+const email_pattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const password_pattern = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[a-zA-Z0-9]{8,}$/;
+
 
   const db= knex({
     client: 'pg',
@@ -23,16 +27,29 @@ let quoteHistory = [
         deliveryDate: '01-10-9024',
         pricePerGallon: 999,
         amountDue: 147
+
+
+    },
+    {
+        id: 4,
+        clientName: 'Cena Doe',
+        gallonsRequested: 799,
+        deliveryAddress: '789 St.',
+        deliveryDate: '01-10-2024',
+        pricePerGallon: 999,
+        amountDue: 2902
+
+        
     },
     // Add more quote objects as needed
 ];
 
-db.select('*').from('users').then(data=>{
-    console.log(data);
-});
-db.select('*').from('login').then(data=>{
-    console.log(data);
-});
+// db.select('*').from('users').then(data=>{
+//    // console.log(data);
+// });
+// db.select('*').from('login').then(data=>{
+//     //console.log(data);
+// });
 /*
 const database ={
     users:[
@@ -76,9 +93,31 @@ app.use(cors())
 app.get('/',(req,res)=>{
     res.json(quoteHistory);
 });
+// app.post('/users', (req, res) => {
+//     //res.send("works");
+//     const{username, password} = req.body;
+//     if(!username || !password){
+//         res.sendStatus(400);
+//     }else{
+//     res.sendStatus(200);
+//     }
 
+//   })
+
+//   app.post('/login', (req, res) => {
+//     //res.send("works");
+//     const{email, password} = req.body;
+//     if(!email || !password){
+//         res.sendStatus(400);
+//     }else{
+//     res.sendStatus(200);
+//     }
+//   })
 app.post('/updateprofile',(req,res)=>{
     const{fullname, address1, address2, city,selectedState, zipcode,id} = req.body;
+    if(!fullname || fullname.length > 100 || !address1 ||!city || !selectedState|| selectedState.length >2 || !zipcode || zipcode.length < 5 || zipcode.length > 9|| !id){
+        res.status(400);
+    }
     db('users')
   .where({ id: id })
   .update({ fullname: fullname, address1: address1,address2: address2,city: city, province: selectedState,zipcode:zipcode })
@@ -109,6 +148,9 @@ app.post('/updateprofile',(req,res)=>{
 
 app.post('/signin',(req,res)=>{
     
+    if (!email_pattern.test(req.body.email) || !password_pattern.test(req.body.password)) {
+        return res.status(400).json('All fields are required');
+    }
     db.select('email','hash').from('login')
     .where('email', '=', req.body.email)
     .then(data =>{
@@ -137,6 +179,18 @@ app.post('/signin',(req,res)=>{
 
 app.post('/register',(req,res)=>{
     const{email, name, password} = req.body;
+    
+    if (!email_pattern.test(email) || !name || !password_pattern.test(password)) {
+        return res.status(789).json('All fields are required');
+    }
+
+    // Check password length and complexity
+    const MIN_PASSWORD_LENGTH = 8;
+    if (password.length < MIN_PASSWORD_LENGTH) {
+        return res.status(789).json('Password must be at least 8 characters long');
+    }
+
+
     const hash = bcrypt.hashSync(password);
     db.transaction(trx=>{
         trx.insert({
@@ -165,12 +219,9 @@ app.post('/register',(req,res)=>{
                 }
                 else{
                     res.status(400).json('User not found in database')
-                }
-            
-            
+                }           
         })
     })
-
    .then(trx.commit)
    .catch(trx.rollback)
     })
@@ -198,7 +249,10 @@ app.post('/register',(req,res)=>{
 
 
 app.post('/clientprofile',(req,res)=>{
-    const{fullname,name, address1, address2, city,selectedState, zipcode,id} = req.body;
+    const{fullname, name, address1, address2, city,selectedState, zipcode,id} = req.body;
+    if(!fullname || fullname.length > 100 ||  !name || name.length > 100 ||  !address1 ||!city || !selectedState|| selectedState.length >2 || !zipcode || zipcode.length < 5 || zipcode.length > 9|| !id){
+        res.status(400);
+    }
     
     db('users')
   .where({ id: id })
@@ -210,7 +264,7 @@ app.post('/clientprofile',(req,res)=>{
             res.json(user[0])
         }
         else{
-            res.status(401).json('User not found in database')
+            res.status(501).json('User not found in database')
         }
        
     })
@@ -218,27 +272,27 @@ app.post('/clientprofile',(req,res)=>{
     
     
 });
-app.get('/profile/:id',(req,res)=>{
-    const{id} = req.params;
+// app.get('/profile/:id',(req,res)=>{
+//     const{id} = req.params;
     
-    db.select('*').from('users').where({id})
-    .then(user=>{
-        console.log(user)
-        if(user.length){
-            res.json(user[0])
-        }
-        else{
-            res.status(400).json('User not found in database')
-        }
+//     db.select('*').from('users').where({id})
+//     .then(user=>{
+//         console.log(user)
+//         if(user.length){
+//             res.json(user[0])
+//         }
+//         else{
+//             res.status(400).json('User not found in database')
+//         }
        
-    })
-    .catch(err => res.status(400).json('Error getting user'))
+//     })
+//     .catch(err => res.status(400).json('Error getting user'))
     
     
-});
+// });
 app.post('/GetQuote', (req, res) => {
     const { gallonsRequested, deliveryDate, deliveryAddress,id,clientName } = req.body;
-
+    console.log(deliveryDate);
     // Validate required fields
     if (!gallonsRequested || !deliveryDate) {
         return res.status(400).json({ error: 'Gallons requested and delivery date are required fields' });
@@ -287,4 +341,11 @@ app.post('/qoutehistory',(req,res)=>{
 });
 
 
-app.listen(3000);
+// const PORT = process.env.PORT || 3000;
+const PORT = 3000;
+ app.listen(PORT, () => {
+
+   console.log('Server is running on port PORT' + {PORT});
+ });
+ 
+module.exports = app;
