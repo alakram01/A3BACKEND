@@ -19,31 +19,7 @@ const password_pattern = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[a-zA-Z0-9]{8,}$/;
     }
 });
 
-let quoteHistory = [
-    {
-        id: 3,
-        clientName: 'Jon Doe',
-        gallonsRequested: 799,
-        deliveryAddress: '789 St.',
-        deliveryDate: '01-10-9024',
-        pricePerGallon: 999,
-        amountDue: 147
 
-
-    },
-    {
-        id: 4,
-        clientName: 'Cena Doe',
-        gallonsRequested: 799,
-        deliveryAddress: '789 St.',
-        deliveryDate: '01-10-2024',
-        pricePerGallon: 999,
-        amountDue: 2902
-
-        
-    },
-    // Add more quote objects as needed
-];
 // db.select('*').from('users').then(data=>{
 //    // console.log(data);
 // });
@@ -90,9 +66,9 @@ const database ={
 app.use(express.json());
 app.use(cors())
 
-app.get('/',(req,res)=>{
-    res.json(quoteHistory);
-});
+// app.get('/',(req,res)=>{
+//     res.json(quoteHistory);
+// });
 // app.post('/users', (req, res) => {
 //     //res.send("works");
 //     const{username, password} = req.body;
@@ -130,20 +106,8 @@ app.post('/updateprofile',(req,res)=>{
         else{
             res.status(401).json('User not found in database')
         }
-       
     })
-.catch(err => res.status(400).json('Error getting user'))
-   
-    
-});
-
-
-
-
-
-
-
-
+.catch(err => res.status(400).json('Error getting user'))});
 
 
 app.post('/signin',(req,res)=>{
@@ -217,14 +181,7 @@ app.post('/register',(req,res)=>{
                 if(user.length){
                     res.json(user[0])
                 }
-                else{
-                    res.status(400).json('User not found in database')
-                }           
-        })
-    })
-   .then(trx.commit)
-   .catch(trx.rollback)
-    })
+                else{res.status(400).json('User not found in database')}})}).then(trx.commit).catch(trx.rollback)})
 .catch(err => res.status(789).json('Error logging in'))
 })
     
@@ -253,7 +210,6 @@ app.post('/clientprofile',(req,res)=>{
     if(!fullname || fullname.length > 100 ||  !name || name.length > 100 ||  !address1 ||!city || !selectedState|| selectedState.length >2 || !zipcode || zipcode.length < 5 || zipcode.length > 9|| !id){
         res.status(400);
     }
-    
     db('users')
   .where({ id: id })
   .update({ fullname: fullname, address1: address1,address2: address2,city: city, province: selectedState,zipcode:zipcode })
@@ -262,15 +218,13 @@ app.post('/clientprofile',(req,res)=>{
         console.log(user[0]) ;
         if(user.length){
             res.json(user[0])
+            res.status('ok');
         }
         else{
             res.status(501).json('User not found in database')
         }
-       
     })
 .catch(err => res.status(400).json('Error getting user'))
-    
-    
 });
 // app.get('/profile/:id',(req,res)=>{
 //     const{id} = req.params;
@@ -291,39 +245,68 @@ app.post('/clientprofile',(req,res)=>{
     
 // });
 
-
-app.post('/GetQuote', (req, res) => {
-    const { gallonsRequested, deliveryDate, deliveryAddress,id,clientName } = req.body;
-    console.log(deliveryDate);
-    // Validate required fields
+app.post('/GetQuote', async (req, res) => {
+    const { gallonsRequested, deliveryDate, deliveryAddress, id, clientName } = req.body;
+ // Validate required fields
     if (!gallonsRequested || !deliveryDate) {
         return res.status(400).json({ error: 'Gallons requested and delivery date are required fields' });
     }
-
-    // Calculate suggested price and total amount due
-    const suggestedPrice = calculateSuggestedPrice(gallonsRequested, deliveryDate);
-    const totalAmountDue = calculateTotalAmountDue(gallonsRequested, suggestedPrice);
-
-    // Generate a unique id (replace this with your logic)
-
-
-    // Construct quote object
-    const newQuote = {
-        id,
-        clientName,
-        gallonsRequested,
-        deliveryAddress, // Placeholder for client address
-        deliveryDate,
-        pricePerGallon: suggestedPrice,
-        amountDue: totalAmountDue
-    };
-
-    // Update database (or array) with the new quote
-    quoteHistory.push(newQuote);
-
-    // Redirect to GetQuote history upon successful database update
-    res.json('ok');
+    try {
+        // Calculate suggested price and total amount due
+        const suggestedPrice = calculateSuggestedPrice(gallonsRequested, deliveryDate);
+        const totalAmountDue = calculateTotalAmountDue(gallonsRequested, suggestedPrice);
+        // Insert new quote into the database
+        await db('quotes').insert({
+            id,
+            client_name: clientName,
+            gallons_requested: gallonsRequested,
+            delivery_address: deliveryAddress,
+            delivery_date: deliveryDate,
+            price_per_gallon: suggestedPrice,
+            amount_due: totalAmountDue
+        });
+        // Send response
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Error saving quote:', error);
+        res.status(500).json( 'Internal server error' );
+    
+    }
+    res.status('ok');
 });
+
+// app.post('/GetQuote', (req, res) => {
+//     const { gallonsRequested, deliveryDate, deliveryAddress,id,clientName } = req.body;
+//     console.log(deliveryDate);
+//     // Validate required fields
+//     if (!gallonsRequested || !deliveryDate) {
+//         return res.status(400).json({ error: 'Gallons requested and delivery date are required fields' });
+//     }
+
+//     // Calculate suggested price and total amount due
+//     const suggestedPrice = calculateSuggestedPrice(gallonsRequested, deliveryDate);
+//     const totalAmountDue = calculateTotalAmountDue(gallonsRequested, suggestedPrice);
+
+//     // Generate a unique id (replace this with your logic)
+
+
+//     // Construct quote object
+//     const newQuote = {
+//         id,
+//         clientName,
+//         gallonsRequested,
+//         deliveryAddress, // Placeholder for client address
+//         deliveryDate,
+//         pricePerGallon: suggestedPrice,
+//         amountDue: totalAmountDue
+//     };
+
+//     // Update database (or array) with the new quote
+//     quoteHistory.push(newQuote);
+
+//     // Redirect to GetQuote history upon successful database update
+//     res.json('ok');
+// });
 function calculateSuggestedPrice(gallonsRequested, deliveryDate) {
     // Your logic for calculating suggested price based on gallonsRequested and deliveryDate
     return 2.5; // Placeholder value
@@ -334,13 +317,31 @@ function calculateTotalAmountDue(gallonsRequested, suggestedPrice) {
     return gallonsRequested * suggestedPrice; // Placeholder value
 }
 
-app.post('/qoutehistory',(req,res)=>{
-    const {id} = req.body;
-    //console.log(id, quoteHistory);
-    const robots = quoteHistory.filter(qoute => qoute.id === id);
-    console.log(robots);
-    res.json(robots);
+
+
+app.post('/qoutehistory', async (req, res) => {
+    const { id } = req.body;
+    try {
+        const quotes = await db('quotes').where({ id });
+        res.json(quotes);
+        res.status('ok');
+    } catch (error) {
+        console.error('Error retrieving quote history:', error);
+        res.status(500).json({ error: 'Unable to retrieve quote history' });
+    }
+    res.status('ok');
 });
+
+
+
+
+// app.post('/qoutehistory',(req,res)=>{
+//     const {id} = req.body;
+//     //console.log(id, quoteHistory);
+//     const robots = quoteHistory.filter(qoute => qoute.id === id);
+//     console.log(robots);
+//     res.json(robots);
+// });
 
 
 

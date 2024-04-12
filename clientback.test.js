@@ -29,7 +29,7 @@ describe("POST /register", () => {
     test("should respond with 200", async () => {
       const response = await supertest(app).post("/register").send({
         
-        email: "jujusssshebeat@gmail.com",
+        email: "jjjaeilpzhoey@gmail.com",
         name: "joe",
         password: "Chris123456",
       });
@@ -48,7 +48,7 @@ describe("POST /register", () => {
       test("should respond with 200", async () => {
         const response = await supertest(app).post("/signin").send({
           
-          email: "Amuljakkaemail@email.com",
+          email: "j@gmail.com",
           password: "Chris123456",
         });
         expect(response.statusCode).toBe(200);
