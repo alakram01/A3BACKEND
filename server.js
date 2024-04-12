@@ -225,6 +225,8 @@ app.post('/clientprofile',(req,res)=>{
         }
     })
 .catch(err => res.status(400).json('Error getting user'))
+    
+    
 });
 // app.get('/profile/:id',(req,res)=>{
 //     const{id} = req.params;
@@ -245,9 +247,11 @@ app.post('/clientprofile',(req,res)=>{
     
 // });
 
-app.post('/GetQuote', async (req, res) => {
-    const { gallonsRequested, deliveryDate, deliveryAddress, id, clientName } = req.body;
- // Validate required fields
+
+app.post('/GetQuote', (req, res) => {
+    const { gallonsRequested, deliveryDate, deliveryAddress,id,clientName } = req.body;
+    console.log(deliveryDate);
+    // Validate required fields
     if (!gallonsRequested || !deliveryDate) {
         return res.status(400).json({ error: 'Gallons requested and delivery date are required fields' });
     }
@@ -346,7 +350,6 @@ app.post('/qoutehistory', async (req, res) => {
 
 
 
-// const PORT = process.env.PORT || 3000;
 const PORT = 3000;
  app.listen(PORT, () => {
 
