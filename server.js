@@ -248,7 +248,7 @@ app.post('/clientprofile',(req,res)=>{
 // });
 
 
-app.post('/GetQuote', (req, res) => {
+app.post('/GetQuote', async(req, res) => {
     const { gallonsRequested, deliveryDate, deliveryAddress,id,clientName } = req.body;
     console.log(deliveryDate);
     // Validate required fields
