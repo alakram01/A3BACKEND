@@ -260,7 +260,7 @@ app.post('/GetQuote', (req, res) => {
         const suggestedPrice = calculateSuggestedPrice(gallonsRequested, deliveryDate);
         const totalAmountDue = calculateTotalAmountDue(gallonsRequested, suggestedPrice);
         // Insert new quote into the database
-        await db('quotes').insert({
+         db('quotes').insert({
             id,
             client_name: clientName,
             gallons_requested: gallonsRequested,
@@ -347,6 +347,7 @@ app.post('/qoutehistory', async (req, res) => {
 //     res.json(robots);
 // });
 
+//testing
 
 
 
