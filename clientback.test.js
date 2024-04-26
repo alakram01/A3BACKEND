@@ -1,7 +1,8 @@
 const supertest = require("supertest");
 const app = require("./server");
-const http = require('http');
+const http = require("http");
 const request = require("supertest");
+const { describe, test } = require("@jest/globals");
 // Your test code here
 
 // describe("POST /users", () => {
@@ -21,57 +22,55 @@ const request = require("supertest");
 //   });
 // });
 
-
-
-
 describe("POST /register", () => {
   describe("given a email and password", () => {
     test("should respond with 200", async () => {
       const response = await supertest(app).post("/register").send({
-        
-        email: "jjjaeilpzhoey@gmail.com",
+        email: "xyz1248949@gmail.com",
         name: "joe",
-        password: "Chris123456",
+        password: "Chris123456@",
       });
       expect(response.statusCode).toBe(200);
     });
     test("should validate the request body and return a 400 status code if fields are missing", async () => {
-          const response = await supertest(app).post("/register").send({});
-          expect(response.statusCode).toBe(789);
-        });
-
+      const response = await supertest(app).post("/register").send({});
+      expect(response.statusCode).toBe(789);
+    });
   });
 });
 
-  describe("POST /signin", () => {
-    describe("given a email and password", () => {
-      test("should respond with 200", async () => {
-        const response = await supertest(app).post("/signin").send({
-          
-          email: "j@gmail.com",
-          password: "Chris123456",
-        });
-        expect(response.statusCode).toBe(200);
+describe("POST /signin", () => {
+  describe("given a email and password", () => {
+    test("should respond with 200", async () => {
+      const response = await supertest(app).post("/signin").send({
+        email: "xyz1238@gmail.com",
+        password: "Chris123456@",
       });
-    });
-    test("should validate the request body and return a 400 status code if fields are missing", async () => {
-      const response = await supertest(app).post("/signin").send({});
-      expect(response.statusCode).toBe(400);
+      expect(response.statusCode).toBe(200);
     });
   });
-  // test("should respond with 400 for invalid credentials", async () => {
-  //   const response = await supertest(app).post("/login").send({
-  //     email: "wrong",
-  //     password: "credentials"
-  //   });
-  //   expect(response.statusCode).toBe(400);
-  // });
+  test("should validate the request body and return a 400 status code if fields are missing", async () => {
+    const response = await supertest(app).post("/signin").send({});
+    expect(response.statusCode).toBe(400);
+  });
+});
+// test("should respond with 400 for invalid credentials", async () => {
+//   const response = await supertest(app).post("/login").send({
+//     email: "wrong",
+//     password: "credentials"
+//   });
+//   expect(response.statusCode).toBe(400);
+// });
 
- 
+describe("GET /", () => {
+  test('should respond with success when statement is "test"', async () => {
+    const response = await supertest(app).get("/").send({ statement: "test" });
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toBe("Success"); // Assuming you expect the response body to be 'Success'
+  });
+});
 
-
-
-describe('POST /clientprofile', () => {
+describe("POST /clientprofile", () => {
   describe("given a client info", () => {
     test("should respond with 200", async () => {
       const requestData = {
@@ -81,20 +80,20 @@ describe('POST /clientprofile', () => {
         city: "Anytown",
         selectedState: "NY",
         zipcode: "12345",
-        id: 4 
+        id: 4,
       };
-      const response = await supertest(app).post("/clientprofile").send(requestData);
-      console.log('Response:', response.body);
+      const response = await supertest(app)
+        .post("/clientprofile")
+        .send(requestData);
+      console.log("Response:", response.body);
       expect(response.statusCode).toBe(200);
-      
     });
   });
 
   describe("when email and password is not there", () => {});
 });
 
-
-describe('POST /updateprofile', () => {
+describe("POST /updateprofile", () => {
   describe("given a client info", () => {
     test("should respond with 200", async () => {
       const requestData = {
@@ -103,20 +102,18 @@ describe('POST /updateprofile', () => {
         city: "Anytown",
         selectedState: "NY",
         zipcode: "12345",
-        id: 4 
+        id: 4,
       };
-      const response = await supertest(app).post("/updateprofile").send(requestData);
-      console.log('Response:', response.body);
+      const response = await supertest(app)
+        .post("/updateprofile")
+        .send(requestData);
+      console.log("Response:", response.body);
       expect(response.statusCode).toBe(200);
-      
     });
   });
 
   describe("when email and password is not there", () => {});
 });
-
-
-
 
 describe("POST /qoutehistory", () => {
   describe("given a id for quote history", () => {
@@ -131,16 +128,15 @@ describe("POST /qoutehistory", () => {
   describe("when email and password is not there", () => {});
 });
 
-
 describe("POST /GetQuote", () => {
   describe("given a id for quote history", () => {
     test("should respond with 200", async () => {
       const response = await supertest(app).post("/GetQuote").send({
         gallonsRequested: 799,
-        deliveryDate: '01-10-2024',
-        deliveryAddress: '789 St',
+        deliveryDate: "01-10-2024",
+        deliveryAddress: "789 St",
         id: 4,
-        clientName: "Cena Doe"
+        clientName: "Cena Doe",
       });
       expect(response.statusCode).toBe(200);
     });
@@ -149,6 +145,22 @@ describe("POST /GetQuote", () => {
   describe("when email and password is not there", () => {});
 });
 
+describe("POST /PseudoQuote", () => {
+  describe("given a id for quote history", () => {
+    test("should respond with 200", async () => {
+      const response = await supertest(app).post("/PseudoQuote").send({
+        gallonsRequested: 799,
+        deliveryDate: "01-10-2024",
+        deliveryAddress: "789 St",
+        id: 4,
+        clientName: "Cena Doe",
+      });
+      expect(response.statusCode).toBe(200);
+    });
+  });
+
+  describe("when email and password is not there", () => {});
+});
 
 // const server = http.createServer(app);
 
