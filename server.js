@@ -24,7 +24,7 @@ const db = knex({
 // db.select('*').from('login').then(data=>{
 //     //console.log(data);
 // });
-/*
+/*////test comments
 const database ={
     users:[
         {
